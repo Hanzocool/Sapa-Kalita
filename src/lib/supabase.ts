@@ -77,10 +77,12 @@ export const auth = {
       email,
       password,
       options: {
+        emailRedirectTo: undefined,
         data: {
           full_name: fullName,
           role: 'user'
-        }
+        },
+        captchaToken: undefined
       }
     });
   },
