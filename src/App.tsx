@@ -16,11 +16,12 @@ import {
 import { useAuth } from './hooks/useAuth';
 import { useNews } from './hooks/useNews';
 import { LoginForm } from './components/auth/LoginForm';
+import { RegisterForm } from './components/auth/RegisterForm';
 import { NewsList } from './components/news/NewsList';
 import { ResidentForm } from './components/residents/ResidentForm';
 import { ResidentDirectory } from './components/residents/ResidentDirectory';
 
-type ActivePage = 'home' | 'news' | 'residents' | 'profile' | 'login';
+type ActivePage = 'home' | 'news' | 'residents' | 'profile' | 'login' | 'register';
 
 function App() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -90,7 +91,17 @@ function App() {
           <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4">
             <LoginForm 
               onSuccess={() => setActivePage('home')}
-              onSwitchToRegister={() => {/* Handle register */}}
+              onSwitchToRegister={() => setActivePage('register')}
+            />
+          </div>
+        );
+
+      case 'register':
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4">
+            <RegisterForm 
+              onSuccess={() => setActivePage('home')}
+              onSwitchToLogin={() => setActivePage('login')}
             />
           </div>
         );
