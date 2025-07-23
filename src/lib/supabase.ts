@@ -53,6 +53,23 @@ export interface NewsComment {
   };
 }
 
+export interface ResidentInfo {
+  id: string;
+  user_id: string;
+  full_name: string;
+  phone: string;
+  house_number: string;
+  block: string;
+  family_members: number;
+  occupation: string;
+  emergency_contact: string;
+  vehicle_info: string;
+  notes: string;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // Auth helper functions
 export const auth = {
   signUp: async (email: string, password: string, fullName: string) => {
@@ -257,5 +274,87 @@ export const commentsService = {
       .eq('id', id);
 
     return { error };
+  }
+};
+
+// Resident Info helper functions
+export const residentService = {
+  // Get all public resident info
+  getPublicResidents: async () => {
+    const { data, error } = await supabase
+      .from('resident_info')
+      .select('*')
+      .eq('is_public', true)
+      .order('block', { ascending: true })
+      .order('house_number', { ascending: true });
+
+    return { data, error };
+  },
+
+  // Get resident info by block
+  getResidentsByBlock: async (block: string) => {
+    const { data, error } = await supabase
+      .from('resident_info')
+      .select('*')
+      .eq('is_public', true)
+      .eq('block', block)
+      .order('house_number', { ascending: true });
+
+    return { data, error };
+  },
+
+  // Get current user's resident info
+  getCurrentUserResident: async () => {
+    const { data, error } = await supabase
+      .from('resident_info')
+      .select('*')
+      .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+      .single();
+
+    return { data, error };
+  },
+
+  // Create or update resident info
+  upsertResident: async (residentData: Partial<ResidentInfo>) => {
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) throw new Error('User not authenticated');
+
+    const dataWithUserId = {
+      ...residentData,
+      user_id: user.id
+    };
+
+    const { data, error } = await supabase
+      .from('resident_info')
+      .upsert(dataWithUserId, {
+        onConflict: 'user_id'
+      })
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
+  // Delete resident info
+  deleteResident: async (id: string) => {
+    const { error } = await supabase
+      .from('resident_info')
+      .delete()
+      .eq('id', id);
+
+    return { error };
+  },
+
+  // Get blocks list
+  getBlocks: async () => {
+    const { data, error } = await supabase
+      .from('resident_info')
+      .select('block')
+      .eq('is_public', true);
+
+    if (error) return { data: [], error };
+
+    const uniqueBlocks = [...new Set(data?.map(item => item.block) || [])].sort();
+    return { data: uniqueBlocks, error: null };
   }
 };
