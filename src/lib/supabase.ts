@@ -114,7 +114,7 @@ export const newsService = {
       .select(`
         *,
         category:news_categories(*),
-        author:auth.users(id, email, raw_user_meta_data)
+        author:users(id, email, raw_user_meta_data)
       `)
       .eq('status', 'published')
       .order('published_at', { ascending: false })
@@ -130,7 +130,7 @@ export const newsService = {
       .select(`
         *,
         category:news_categories(*),
-        author:auth.users(id, email, raw_user_meta_data)
+        author:users(id, email, raw_user_meta_data)
       `)
       .eq('status', 'published')
       .eq('category_id', categoryId)
@@ -147,10 +147,10 @@ export const newsService = {
       .select(`
         *,
         category:news_categories(*),
-        author:auth.users(id, email, raw_user_meta_data),
+        author:users(id, email, raw_user_meta_data),
         comments:news_comments(
           *,
-          user:auth.users(id, email, raw_user_meta_data)
+          user:users(id, email, raw_user_meta_data)
         )
       `)
       .eq('id', id)
@@ -245,7 +245,7 @@ export const commentsService = {
       }])
       .select(`
         *,
-        user:auth.users(id, email, raw_user_meta_data)
+        user:users(id, email, raw_user_meta_data)
       `)
       .single();
 
@@ -258,7 +258,7 @@ export const commentsService = {
       .from('news_comments')
       .select(`
         *,
-        user:auth.users(id, email, raw_user_meta_data)
+        user:users(id, email, raw_user_meta_data)
       `)
       .eq('news_id', newsId)
       .order('created_at', { ascending: true });
